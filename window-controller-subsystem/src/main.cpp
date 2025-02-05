@@ -27,7 +27,7 @@ void setup() {
     Serial.begin(BAUD_RATE);
     MsgService.init(BAUD_RATE);
     state = new State();
-    servo = new ServoMotorImpl(PIN_SERVO, TICK_SPEED_MS);
+    servo = new ServoMotorImpl(PIN_SERVO, TICK_SPEED_MS, MOTOR_OPEN);
     potentiometer = new Potentiometer(PIN_POT);
     lcd = new UserConsole();
     lcd->init();

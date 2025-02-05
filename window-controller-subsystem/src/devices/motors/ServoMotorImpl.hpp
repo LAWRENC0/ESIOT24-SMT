@@ -7,7 +7,7 @@
 
 class ServoMotorImpl : public ServoMotor {
    public:
-    ServoMotorImpl(int pin, int tickSpeedMS);
+    ServoMotorImpl(int pin, int tickSpeedMS, int maxAngle);
 
     void on();
     void moveToPosition(int angle);
@@ -17,6 +17,7 @@ class ServoMotorImpl : public ServoMotor {
     int angleToPosition(int angle);
 
    private:
+    int maxAngle;
     int pin;
     int motorPosition;
     int stepSize;
