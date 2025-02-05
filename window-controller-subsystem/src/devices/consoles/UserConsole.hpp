@@ -15,7 +15,8 @@ class UserConsole {
     void turnOffDisplay();
     void turnOnDisplay();
 
-    void display(String s);
+    void display(String s, int row_number);
+    void clearScreen();
 
     void prepareToSleep();
     void resumeFromSleeping();

@@ -1,12 +1,28 @@
 #include "devices/motors/ServoMotorImpl.hpp"
 #include "Arduino.h"
 
-ServoMotorImpl::ServoMotorImpl(int pin) {
+ServoMotorImpl::ServoMotorImpl(int pin, int tickSpeedMS) {
     this->pin = pin;
-    angle = 0;
+    this->motorPosition = this->angleToPosition(0);
+    this->off();
+    // suggested speed for a miuzei microservo ms18 is 0.5 deg / ms
+    this->stepSize = tickSpeedMS * 0.5;
 }
 
-void ServoMotorImpl::on() { motor.attach(pin); }
+int ServoMotorImpl::angleToPosition(int angle) {
+    // 750 -> 0, 2250 -> 180
+    // 750 + angle*(2250-750)/180
+    // updated values: min is 544, max 2400 (see ServoTimer2 doc)
+    float coeff = (2400.0 - 544.0) / 180;
+    return 544 + angle * coeff;
+}
+
+void ServoMotorImpl::on() {
+    state = true;
+    motor.attach(pin);
+}
+
+bool ServoMotorImpl::getState() { return this->state; }
 
 void ServoMotorImpl::moveToPosition(int angle) {
     if (angle > 180) {
@@ -14,14 +30,23 @@ void ServoMotorImpl::moveToPosition(int angle) {
     } else if (angle < 0) {
         angle = 0;
     }
-    // 750 -> 0, 2250 -> 180
-    // 750 + angle*(2250-750)/180
-    // updated values: min is 544, max 2400 (see ServoTimer2 doc)
-    float coeff = (2400.0 - 544.0) / 180;
-    int dest = 544 + angle * coeff;
-    angle = angle + 10 * (abs(dest - angle) / (dest - angle));
+    int dest = angleToPosition(angle);
+    if (dest == motorPosition) {
+        this->off();
+        return;
+    } else if (state == false) {
+        this->on();
+    }
+    if (abs(dest - motorPosition) > stepSize) {
+        motorPosition = motorPosition + stepSize * (abs(dest - motorPosition) / (dest - motorPosition));
+    } else {
+        motorPosition = dest;
+    }
 
-    motor.write(angle);
+    motor.write(motorPosition);
 }
 
-void ServoMotorImpl::off() { motor.detach(); }
+void ServoMotorImpl::off() {
+    state = false;
+    motor.detach();
+}

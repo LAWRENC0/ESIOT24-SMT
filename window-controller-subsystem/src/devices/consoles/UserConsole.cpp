@@ -19,11 +19,12 @@ void UserConsole::turnOnDisplay() {
 
 void UserConsole::turnOffDisplay() { lcd->noDisplay(); }
 
-void UserConsole::display(String s) {
-    lcd->clear();
-    lcd->setCursor(0, 0);
+void UserConsole::display(String s, int row_number) {
+    lcd->setCursor(0, row_number);
     lcd->print(s);
 }
+
+void UserConsole::clearScreen() { lcd->clear(); }
 
 void UserConsole::prepareToSleep() {
     lcd->noDisplay();

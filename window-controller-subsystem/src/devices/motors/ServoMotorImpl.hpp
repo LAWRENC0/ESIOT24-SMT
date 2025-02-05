@@ -7,16 +7,20 @@
 
 class ServoMotorImpl : public ServoMotor {
    public:
-    ServoMotorImpl(int pin);
+    ServoMotorImpl(int pin, int tickSpeedMS);
 
     void on();
     void moveToPosition(int angle);
     int getAngle();
     void off();
+    bool getState();
+    int angleToPosition(int angle);
 
    private:
     int pin;
-    int angle;
+    int motorPosition;
+    int stepSize;
+    bool state;
     ServoTimer2 motor;
 };
 
